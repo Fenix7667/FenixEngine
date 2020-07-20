@@ -33,8 +33,7 @@ int main() {
 
     FenixEngine::initializeBuffers(FenixEngine::getDefaultVertexArray(), FenixEngine::getDefaultIndicesArray());
 
-    unsigned int shader = FenixEngine::createShader("   color = vec4(0.0, 0.0, 1.0, 1.0); \n");
-    glUseProgram(shader);
+    FenixEngine::createShader("   color = vec4(0.0, 0.0, 1.0, 1.0); \n");
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
