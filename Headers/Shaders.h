@@ -59,6 +59,8 @@ namespace FenixEngine {
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
+        glUseProgram(program);
+
         return program;
     };
 };
