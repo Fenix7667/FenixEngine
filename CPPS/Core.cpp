@@ -1,9 +1,11 @@
-#include <GL/glew.h>;
+#include <glad/glad.h>;
 #include <GLFW/glfw3.h>;
 
+#include "../Headers/ErrorHandler.h";
 #include "../Headers/Buffers.h";
 #include "../Headers/Shaders.h";
 #include "../Headers/Render.h";
+#include "../Headers/Events.h";
 
 #include <iostream>;
 #include <string>;
@@ -16,7 +18,7 @@ int main() {
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "| FenixEngine |", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "| FenixEngine |", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -25,24 +27,39 @@ int main() {
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
 
-    if (glewInit() != GLEW_OK)
-       std::cout << "Glew is not ok!" << std::endl;
+    glViewport(0, 0, 800, 600);
 
-    std::cout << glGetString(GL_VERSION) << std::endl;
+    glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+        glViewport(0, 0, width, height);
+    });
 
-    FenixEngine::initializeBuffers(FenixEngine::getDefaultVertexArray(), FenixEngine::getDefaultIndicesArray());
+    // Fenix Engine initializers:
 
-    FenixEngine::createShader("   color = vec4(0.0, 0.0, 1.0, 1.0); \n");
+    FenixEngine::createShader(1.0f, 1.0f, 1.0f);
+
+    // Some events handler:
+
+    glfwSetMouseButtonCallback(window, FenixEngine::onClick);
 
     /* Loop until the user closes the window */
+
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
+
+        glClearColor(0.31f, 0.31f, 0.31f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        FenixEngine::drawVertexArray(FenixEngine::getDefaultIndicesArray());
-        
+        FenixEngine::glClearError();
+        FenixEngine::onRender();
+        FenixEngine::glCheckError();
+
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
