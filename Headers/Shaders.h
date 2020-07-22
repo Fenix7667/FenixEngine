@@ -1,5 +1,6 @@
 #pragma once
-#include <GL/glew.h>;
+
+#include <glad/glad.h>;
 #include <GLFW/glfw3.h>;
 
 #include <iostream>;
@@ -18,8 +19,10 @@ namespace FenixEngine {
             glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
             char* message = (char*)_malloca(length * sizeof(char));
             glGetShaderInfoLog(id, length, &length, message);
+
             std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader!" << std::endl;
             std::cout << message << std::endl;
+
             glDeleteShader(id);
 
             return 0;
@@ -28,24 +31,26 @@ namespace FenixEngine {
         return id;
     };
 
-    static unsigned int createShader(std::string color) {
+    static unsigned int createShader(float r, float b, float g) {
         std::string vertexShaderConfig =
             "#version 330 core\n"
             "\n"
             "layout(location = 0) in vec4 position;\n"
             "\n"
-            "void main()\n"
-            "{\n"
+            "void main() {\n"
             "   gl_Position = position;\n"
-            "}\n";
+            "};\n";
 
         std::string fragmentShaderConfig =
             "#version 330 core\n"
             "\n"
             "layout(location = 0) out vec4 color;\n"
             "\n"
-            "void main()\n"
-            "{\n" + color + "}";
+            "uniform vec4 u_Color;\n"
+            "\n"
+            "void main() {\n"
+            "   color = u_Color;\n"
+            "};\n";
 
         unsigned int program = glCreateProgram();
         unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderConfig);
@@ -60,6 +65,9 @@ namespace FenixEngine {
         glDeleteShader(fragmentShader);
 
         glUseProgram(program);
+
+        int location = glGetUniformLocation(program, "u_Color");
+        glUniform4f(location, r, g, b, 1.0f);
 
         return program;
     };
